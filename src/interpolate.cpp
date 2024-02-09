@@ -12,6 +12,9 @@ static void report_interp_error(int ierr) {
   }
 }
 
+/* TODO: This function uses the cactus interpolation infrastructure, so it
+ * should work out of the box, but maybe it won't
+ */
 void MultipoleX::Interp(CCTK_ARGUMENTS, const real_vec &xs, const real_vec &ys,
                         const real_vec &zs, int real_idx, int imag_idx,
                         real_vec &sphere_real, real_vec &sphere_imag) {

@@ -1,5 +1,8 @@
 #include "coordinates.hpp"
 
+#include <cctk_Arguments.h>
+#include <cctk_Parameters.h>
+
 #include <cmath>
 
 void MultipoleX::CoordSetup(real_vec &xhat, real_vec &yhat, real_vec &zhat,
@@ -18,7 +21,7 @@ void MultipoleX::CoordSetup(real_vec &xhat, real_vec &yhat, real_vec &zhat,
   const CCTK_REAL dph = 2 * M_PI / (nphi + is_midpoint);
   for (int it = 0; it <= ntheta; it++) {
     for (int ip = 0; ip <= nphi; ip++) {
-      const int i = Multipole_Index(it, ip, ntheta);
+      const int i = MultipoleX::index(it, ip, ntheta);
 
       /*
        * Check for when midpoint enabled:

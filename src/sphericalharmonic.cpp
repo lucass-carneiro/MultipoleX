@@ -1,6 +1,5 @@
 #include "sphericalharmonic.hpp"
 
-#include <cctk.h>
 #include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
 
@@ -32,7 +31,7 @@ void MultipoleX::HarmonicSetup(int s, int l, int m, const real_vec &th,
                                const real_vec &ph, real_vec &reY,
                                real_vec &imY) {
   for (size_t i = 0; i < th.size(); i++) {
-    Multipole_SphericalHarmonic(s, l, m, th[i], ph[i], &reY[i], &imY[i]);
+    SphericalHarmonic(s, l, m, th[i], ph[i], &reY[i], &imY[i]);
   }
 }
 
@@ -61,31 +60,33 @@ void MultipoleX::SphericalHarmonic(int s, int l, int m, CCTK_REAL th,
 }
 
 // TODO: Change loop to CarpetX
+// TODO: Enable this function for testing in the schedule.
 // Fill a grid function with a given spherical harmonic
-extern "C" void Multipole_SetHarmonic(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_Multipole_SetHarmonic;
-  DECLARE_CCTK_PARAMETERS;
+// extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
+//   DECLARE_CCTK_ARGUMENTS_MultipoleX_SetHarmonic;
+//   DECLARE_CCTK_PARAMETERS;
 
-  for (int k = 0; k < cctk_lsh[2]; k++) {
-    for (int j = 0; j < cctk_lsh[1]; j++) {
-      for (int i = 0; i < cctk_lsh[0]; i++) {
-        int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
+//   for (int k = 0; k < cctk_lsh[2]; k++) {
+//     for (int j = 0; j < cctk_lsh[1]; j++) {
+//       for (int i = 0; i < cctk_lsh[0]; i++) {
+//         int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
 
-        CCTK_REAL theta = acos(z[index] / r[index]);
-        CCTK_REAL phi = atan2(y[index], x[index]);
+//         CCTK_REAL theta = acos(z[index] / r[index]);
+//         CCTK_REAL phi = atan2(y[index], x[index]);
 
-        CCTK_REAL re = 0;
-        CCTK_REAL im = 0;
+//         CCTK_REAL re = 0;
+//         CCTK_REAL im = 0;
 
-        Multipole_SphericalHarmonic(test_sw, test_l, test_m, theta, phi, &re,
-                                    &im);
+//         MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi,
+//         &re,
+//                                       &im);
 
-        CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
+//         CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
 
-        harmonic_re[index] = re * fac;
-        harmonic_im[index] = im * fac;
-      }
-    }
-  }
-  return;
-}
+//         harmonic_re[index] = re * fac;
+//         harmonic_im[index] = im * fac;
+//       }
+//     }
+//   }
+//   return;
+// }

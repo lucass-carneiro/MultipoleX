@@ -175,16 +175,16 @@ void MultipoleX::Integrate(const real_vec &array1r, const real_vec &array1i,
                            CCTK_REAL *outre, CCTK_REAL *outim) {
   DECLARE_CCTK_PARAMETERS
 
-  int il = Multipole_Index(0, 0, ntheta);
-  int iu = Multipole_Index(1, 0, ntheta);
+  int il = MultipoleX::index(0, 0, ntheta);
+  int iu = MultipoleX::index(1, 0, ntheta);
   CCTK_REAL dth = th[iu] - th[il];
-  iu = Multipole_Index(0, 1, ntheta);
+  iu = MultipoleX::index(0, 1, ntheta);
   CCTK_REAL dph = ph[iu] - ph[il];
 
   const size_t array_size = th.size();
 
-  static vector<CCTK_REAL> fr(array_size);
-  static vector<CCTK_REAL> fi(array_size);
+  static real_vec fr(array_size);
+  static real_vec fi(array_size);
 
   // the below calculations take the integral of conj(array1)*array2*sin(th)
   assert(th.size() == array_size);

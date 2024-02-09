@@ -1,16 +1,27 @@
 #include "type_aliases.hpp"
 #include "mode_array.hpp"
+#include "coordinates.hpp"
+#include "interpolate.hpp"
+#include "integrate.hpp"
 
-#include <cctk.h>
 #include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
 
 #include <vector>
 
+// For backward compatibility we allow the user to set l_mode instead
+// of l_max, but if it is left at the default of -1, l_max is used.
+static int get_l_max() {
+  DECLARE_CCTK_PARAMETERS;
+  return l_mode == -1 ? l_max : l_mode;
+}
+
 // TODO: Checked arguments
-extern "C" void Multipole_Calc(CCTK_ARGUMENTS) {
+extern "C" void MultipoleX_Calc(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS
   DECLARE_CCTK_PARAMETERS
+
+  using namespace MultipoleX;
 
   static real_vec xs, ys, zs;
   static real_vec xhat, yhat, zhat;
@@ -42,9 +53,9 @@ extern "C" void Multipole_Calc(CCTK_ARGUMENTS) {
     yhat.resize(array_size);
     zhat.resize(array_size);
 
-    parse_variables_string(string(variables), vars);
+    parse_variables_string(std::string(variables), vars);
     get_spin_weights(vars, spin_weights);
-    Multipole_CoordSetup(xhat, yhat, zhat, th, ph);
+    MultipoleX::CoordSetup(xhat, yhat, zhat, th, ph);
     setup_harmonics(spin_weights, lmax, th, ph, array_size, reY, imY);
     initialized = true;
   }
@@ -58,17 +69,17 @@ extern "C" void Multipole_Calc(CCTK_ARGUMENTS) {
 
     for (int i = 0; i < nradii; i++) {
       // Compute x^i = r * \hat x^i
-      Multipole_ScaleCartesian(radius[i], xhat, yhat, zhat, xs, ys, zs);
+      MultipoleX::ScaleCartesian(radius[i], xhat, yhat, zhat, xs, ys, zs);
 
       // Interpolate Psi4r and Psi4i
-      Multipole_Interp(CCTK_PASS_CTOC, xs, ys, zs, vars[v].index,
-                       vars[v].imag_index, real, imag);
+      MultipoleX::Interp(CCTK_PASS_CTOC, xs, ys, zs, vars[v].index,
+                         vars[v].imag_index, real, imag);
       for (int l = 0; l <= lmax; l++) {
         for (int m = -l; m <= l; m++) {
           // Integrate sYlm (real + i imag) over the sphere at radius r
-          Multipole_Integrate(reY[si][l][m + l], imY[si][l][m + l], real, imag,
-                              th, ph, &modes(v, i, l, m, 0),
-                              &modes(v, i, l, m, 1));
+          MultipoleX::Integrate(reY[si][l][m + l], imY[si][l][m + l], real,
+                                imag, th, ph, &modes(v, i, l, m, 0),
+                                &modes(v, i, l, m, 1));
 
         } // loop over m
       }   // loop over l
@@ -131,8 +142,8 @@ static void setup_harmonics(const vector<int> &spin_weights, int lmax,
       for (int m = -l; m <= lmax; m++) {
         reY[si][l][m + l].resize(array_size);
         imY[si][l][m + l].resize(array_size);
-        Multipole_HarmonicSetup(sw, l, m, th, ph, reY[si][l][m + l],
-                                imY[si][l][m + l]);
+        MultipoleX::HarmonicSetup(sw, l, m, th, ph, reY[si][l][m + l],
+                                  imY[si][l][m + l]);
       }
     }
   }

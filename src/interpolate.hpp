@@ -9,7 +9,7 @@ namespace MultipoleX {
 
 /*
  * This function interpolates psi4 onto the sphere in cartesian coordinates as
- * created by Multipole_CoordSetup.
+ * created by MultipoleX_CoordSetup.
  */
 void Interp(CCTK_ARGUMENTS, const real_vec &x, const real_vec &y,
             const real_vec &z, int real_idx, int imag_idx, real_vec &psi4r,

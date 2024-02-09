@@ -3,7 +3,7 @@
 #include <cctk_Parameters.h>
 
 // TODO: Change to checkd arguments
-extern "C" void Multipole_ParamCheck(CCTK_ARGUMENTS) {
+extern "C" void MultipoleX_ParamCheck(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
   DECLARE_CCTK_ARGUMENTS;
 

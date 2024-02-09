@@ -3,7 +3,7 @@
 
 #include <cctk.h>
 
-#include "utils.hpp"
+#include "type_aliases.hpp"
 
 namespace MultipoleX {
 

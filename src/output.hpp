@@ -21,15 +21,12 @@ void OutputArrayToFile(CCTK_ARGUMENTS, const std::string &name,
 void Output1D(CCTK_ARGUMENTS, const std::string &name, const real_vec &th,
               const real_vec &ph, mp_coord coord, const real_vec &data);
 
-void OutputComplexToFile(CCTK_ARGUMENTS, const string &name, CCTK_REAL redata,
-                         CCTK_REAL imdata);
+void OutputComplexToFile(CCTK_ARGUMENTS, const std::string &name,
+                         CCTK_REAL redata, CCTK_REAL imdata);
 
 // TODO: Maybe the binary output routines should be updated
 void OutputComplexToH5File(CCTK_ARGUMENTS, const variable_desc_vec &vars,
                            const CCTK_REAL radii[], const mode_array &modes);
-
-output_modes(CCTK_ARGUMENTS, const vector<Multipole::variable_desc> &vars,
-             const CCTK_REAL radii[], const Multipole::mode_array &modes) {
 
 } // namespace MultipoleX
 

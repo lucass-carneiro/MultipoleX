@@ -16,6 +16,10 @@ using ylm_t = std::vector<std::vector<std::vector<std::vector<CCTK_REAL> > > >;
 
 using variable_desc_vec = std::vector<variable_desc>;
 
+static inline int index(int it, int ip, int ntheta) {
+  return it + (ntheta + 1) * ip;
+}
+
 } // namespace MultipoleX
 
 #endif // MULTIPOLEX_TYPE_ALIASES_HPP

@@ -1,4 +1,12 @@
 # Main make.code.defn file for thorn MultipoleX
 
 # Source files in this directory
-SRCS = integrate.cpp
+SRCS =                  \
+  coordinates.cpp       \
+  integrate.cpp         \
+  interpolate.cpp       \
+  mode_array.cpp        \
+  multipole_calc.cpp    \
+  output.cpp            \
+  paramcheck.cpp        \
+  sphericalharmonic.cpp \

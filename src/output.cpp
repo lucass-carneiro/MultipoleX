@@ -18,8 +18,15 @@
 #include <hdf5.h>
 #endif
 
+// TODO: C++ 17 has a std::filesystem library. Using this should be no longer
+// required
+#include <sys/stat.h>
+
 #include <cstdio>
-#include <string>
+#include <cstring>
+#include <map>
+#include <sstream>
+#include <iomanip>
 
 // TODO: Change this to a static inline function
 // check return code of HDF5 call abort with an error message if there was an
@@ -38,6 +45,8 @@
 static FILE *OpenOutputFile(CCTK_ARGUMENTS, const std::string &name) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
+
+  using std::strcmp;
 
   bool first_time = cctk_iteration == 0;
   const char *mode = first_time ? "w" : "a";
@@ -62,10 +71,12 @@ static FILE *OpenOutputFile(CCTK_ARGUMENTS, const std::string &name) {
   return fp;
 }
 
-static void OutputArray(CCTK_ARGUMENTS, FILE *f, const real_vec &th,
-                        const real_vec &ph, const real_vec &xs,
-                        const real_vec &ys, const real_vec &zs,
-                        const real_vec &data) {
+static void OutputArray(CCTK_ARGUMENTS, FILE *f, const MultipoleX::real_vec &th,
+                        const MultipoleX::real_vec &ph,
+                        const MultipoleX::real_vec &xs,
+                        const MultipoleX::real_vec &ys,
+                        const MultipoleX::real_vec &zs,
+                        const MultipoleX::real_vec &data) {
   DECLARE_CCTK_PARAMETERS;
   DECLARE_CCTK_ARGUMENTS;
 
@@ -103,12 +114,12 @@ void MultipoleX::Output1D(CCTK_ARGUMENTS, const std::string &name,
 
     if (coord == mp_theta) {
       for (int i = 0; i <= ntheta; i++) {
-        int idx = Multipole_Index(i, 0, ntheta);
+        int idx = MultipoleX::index(i, 0, ntheta);
         fprintf(f, "%f %.19g\n", th[idx], data[idx]);
       }
     } else if (coord == mp_phi) {
       for (int i = 0; i <= nphi; i++) {
-        int idx = Multipole_Index(ntheta / 4, i, ntheta);
+        int idx = MultipoleX::index(ntheta / 4, i, ntheta);
         fprintf(f, "%f %.19g\n", ph[idx], data[idx]);
       }
     }
@@ -117,8 +128,8 @@ void MultipoleX::Output1D(CCTK_ARGUMENTS, const std::string &name,
   }
 }
 
-void Multipole_OutputComplex(CCTK_ARGUMENTS, FILE *fp, CCTK_REAL redata,
-                             CCTK_REAL imdata) {
+void MultipoleX_OutputComplex(CCTK_ARGUMENTS, FILE *fp, CCTK_REAL redata,
+                              CCTK_REAL imdata) {
   DECLARE_CCTK_PARAMETERS;
   DECLARE_CCTK_ARGUMENTS;
   fprintf(fp, "%f %.19g %.19g\n", cctk_time, redata, imdata);
@@ -129,7 +140,7 @@ void MultipoleX::OutputComplexToFile(CCTK_ARGUMENTS, const std::string &name,
   DECLARE_CCTK_ARGUMENTS;
 
   if (FILE *fp = OpenOutputFile(CCTK_PASS_CTOC, name)) {
-    Multipole_OutputComplex(CCTK_PASS_CTOC, fp, redata, imdata);
+    MultipoleX_OutputComplex(CCTK_PASS_CTOC, fp, redata, imdata);
     fclose(fp);
   }
 }
@@ -137,6 +148,7 @@ void MultipoleX::OutputComplexToFile(CCTK_ARGUMENTS, const std::string &name,
 #ifdef HAVE_CAPABILITY_HDF5
 
 static bool file_exists(const std::string &name) {
+  // TODO: Update to C++17
   struct stat sts;
   return !(stat(name.c_str(), &sts) == -1 && errno == ENOENT);
 }
@@ -161,11 +173,14 @@ static bool dataset_exists(hid_t file, const std::string &dataset_name) {
 #endif
 }
 
-void MultipoleX::OutputComplexToH5File(
-    CCTK_ARGUMENTS, const vector<Multipole::variable_desc> &vars,
-    const CCTK_REAL radii[], const Multipole::mode_array &modes) {
+void MultipoleX::OutputComplexToH5File(CCTK_ARGUMENTS,
+                                       const variable_desc_vec &vars,
+                                       const CCTK_REAL radii[],
+                                       const mode_array &modes) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
+
+  using std::strcmp;
 
   const char *my_out_dir = strcmp(out_dir, "") ? out_dir : io_out_dir;
   if (CCTK_CreateDirectory(0755, my_out_dir) < 0)
@@ -173,9 +188,9 @@ void MultipoleX::OutputComplexToH5File(
                "Multipole output directory %s could not be created",
                my_out_dir);
 
-  static map<std::string, bool> checked; // Has the given file been checked
-                                         // for truncation? map<*,bool>
-                                         // defaults to false
+  static std::map<std::string, bool> checked; // Has the given file been checked
+                                              // for truncation? map<*,bool>
+                                              // defaults to false
   for (int v = 0; v < modes.get_nvars(); v++) {
     std::string basename = "mp_" + vars[v].name + ".h5";
     std::string output_name = my_out_dir + std::string("/") + basename;
@@ -196,9 +211,10 @@ void MultipoleX::OutputComplexToH5File(
       const CCTK_REAL rad = radii[i];
       for (int l = 0; l <= modes.get_lmax(); l++) {
         for (int m = -l; m <= l; m++) {
-          ostringstream datasetname;
+          std::ostringstream datasetname;
           datasetname << "l" << l << "_m" << m << "_r"
-                      << setiosflags(ios::fixed) << setprecision(2) << rad;
+                      << std::setiosflags(std::ios::fixed)
+                      << std::setprecision(2) << rad;
 
           hid_t dataset = -1;
 
@@ -267,9 +283,9 @@ void MultipoleX::OutputComplexToH5File(
 #endif
 
 static void output_modes(CCTK_ARGUMENTS,
-                         const vector<Multipole::variable_desc> &vars,
+                         const MultipoleX::variable_desc_vec &vars,
                          const CCTK_REAL radii[],
-                         const Multipole::mode_array &modes) {
+                         const MultipoleX::mode_array &modes) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
@@ -280,13 +296,13 @@ static void output_modes(CCTK_ARGUMENTS,
           const CCTK_REAL rad = radii[i];
           for (int l = 0; l <= modes.get_lmax(); l++) {
             for (int m = -l; m <= l; m++) {
-              ostringstream name;
+              std::ostringstream name;
               name << "mp_" << vars[v].name << "_l" << l << "_m" << m << "_r"
-                   << setiosflags(ios::fixed) << setprecision(2) << rad
-                   << ".asc";
-              Multipole_OutputComplexToFile(CCTK_PASS_CTOC, name.str(),
-                                            modes(v, i, l, m, 0),
-                                            modes(v, i, l, m, 1));
+                   << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+                   << rad << ".asc";
+              MultipoleX::OutputComplexToFile(CCTK_PASS_CTOC, name.str(),
+                                              modes(v, i, l, m, 0),
+                                              modes(v, i, l, m, 1));
             }
           }
         }
@@ -295,37 +311,43 @@ static void output_modes(CCTK_ARGUMENTS,
   }
   if (output_hdf5) {
     if (CCTK_MyProc(cctkGH) == 0) {
-      Multipole_OutputComplexToH5File(CCTK_PASS_CTOC, vars, radii, modes);
+      MultipoleX::OutputComplexToH5File(CCTK_PASS_CTOC, vars, radii, modes);
     }
   }
 }
 
-static void output_1D(CCTK_ARGUMENTS, const Multipole::variable_desc &v,
-                      CCTK_REAL rad, const vector<CCTK_REAL> &th,
-                      const vector<CCTK_REAL> &ph,
-                      const vector<CCTK_REAL> &real,
-                      const vector<CCTK_REAL> &imag) {
+static void output_1D(CCTK_ARGUMENTS, const MultipoleX::variable_desc &v,
+                      CCTK_REAL rad, const MultipoleX::real_vec &th,
+                      const MultipoleX::real_vec &ph,
+                      const MultipoleX::real_vec &real,
+                      const MultipoleX::real_vec &imag) {
   DECLARE_CCTK_ARGUMENTS
   DECLARE_CCTK_PARAMETERS
 
   if (CCTK_MyProc(cctkGH) == 0 && output_ascii) {
     if (out_1d_every != 0 && cctk_iteration % out_1d_every == 0) {
-      ostringstream real_base;
-      real_base << "mp_" << string(CCTK_VarName(v.index)) << "_r"
-                << setiosflags(ios::fixed) << setprecision(2) << rad;
-      Multipole_Output1D(CCTK_PASS_CTOC, real_base.str() + string(".th.asc"),
-                         th, ph, mp_theta, real);
-      Multipole_Output1D(CCTK_PASS_CTOC, real_base.str() + string(".ph.asc"),
-                         th, ph, mp_phi, real);
+      std::ostringstream real_base;
+      real_base << "mp_" << std::string(CCTK_VarName(v.index)) << "_r"
+                << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+                << rad;
+      MultipoleX::Output1D(CCTK_PASS_CTOC,
+                           real_base.str() + std::string(".th.asc"), th, ph,
+                           MultipoleX::mp_theta, real);
+      MultipoleX::Output1D(CCTK_PASS_CTOC,
+                           real_base.str() + std::string(".ph.asc"), th, ph,
+                           MultipoleX::mp_phi, real);
 
       if (v.imag_index != -1) {
-        ostringstream imag_base;
-        imag_base << "mp_" << string(CCTK_VarName(v.imag_index)) << "_r"
-                  << setiosflags(ios::fixed) << setprecision(2) << rad;
-        Multipole_Output1D(CCTK_PASS_CTOC, imag_base.str() + string(".th.asc"),
-                           th, ph, mp_theta, imag);
-        Multipole_Output1D(CCTK_PASS_CTOC, imag_base.str() + string(".ph.asc"),
-                           th, ph, mp_phi, imag);
+        std::ostringstream imag_base;
+        imag_base << "mp_" << std::string(CCTK_VarName(v.imag_index)) << "_r"
+                  << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+                  << rad;
+        MultipoleX::Output1D(CCTK_PASS_CTOC,
+                             imag_base.str() + std::string(".th.asc"), th, ph,
+                             MultipoleX::mp_theta, imag);
+        MultipoleX::Output1D(CCTK_PASS_CTOC,
+                             imag_base.str() + std::string(".ph.asc"), th, ph,
+                             MultipoleX::mp_phi, imag);
       }
     }
   }
