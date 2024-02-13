@@ -1,7 +1,11 @@
 # Parameter definitions for thorn MultipoleX
 
-restricted:
-#Interpolator params:
+RESTRICTED:
+
+#
+# Interpolator params
+#
+
 CCTK_STRING interpolator_name "Which interpolator should I use"
 {
     ".+" :: "Any nonempty string"
