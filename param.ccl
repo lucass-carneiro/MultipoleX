@@ -1,7 +1,6 @@
 # Parameter definitions for thorn MultipoleX
 
 restricted:
-
 #Interpolator params:
 CCTK_STRING interpolator_name "Which interpolator should I use"
 {
@@ -118,7 +117,6 @@ CCTK_BOOLEAN test_mode_proportional_to_r "whether the test spherical harmonic co
 } "no"
 
 
-# TODO: Ian says this is deprecated, but without these, the code wont compile
 # This parameter is deprecated and is no longer used
 KEYWORD mode_type "Which type of mode extraction do we have" STEERABLE=always
 {

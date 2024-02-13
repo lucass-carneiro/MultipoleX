@@ -12,6 +12,13 @@
   - Author A
   - Author B
 
+# TODOs
+
+1. See the `TODOs` marked over the source files
+2. Fill author names.
+3. Add doc
+4. Add test cases.
+
 # Purpose of This Thorn
 
 This thorn is a port of the [Multipole](https://bitbucket.org/einsteintoolkit/einsteinanalysis/src/master/Multipole/) by Ian Hinder and Andrew Knapp.

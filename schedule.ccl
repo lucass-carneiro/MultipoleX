@@ -1,7 +1,53 @@
 # Schedule definitions for thorn MultipoleX
 
+if (enable_test)
+{
+  STORAGE: harmonics[1]
+  STORAGE: test_integration_convergence_orders
+  STORAGE: test_integration_results
+  STORAGE: test_integration_symmetries
+  STORAGE: test_orthonormality
+}
+
+schedule MultipoleX_Calc at CCTK_ANALYSIS after (calc_np,PsiKadelia,Accelerator_CopyBack)
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Calculate Multipoles"
+
 schedule MultipoleX_ParamCheck at CCTK_PARAMCHECK
 {
   LANG: C
   OPTIONS: GLOBAL
-} "Check Multipole parameters"
+} "Check MultipoleX parameters"
+
+# TODO: Reenable tests
+# Tests
+
+if (enable_test)
+{
+  schedule MultipoleX_SetHarmonic at CCTK_INITIAL
+  {
+    Reads: Grid::coordinates(everywhere)
+    Writes: MultipoleX::harmonics(interior)
+    LANG: C
+  } "Populate grid functions with spherical harmonics"
+
+#  schedule MultipoleX_TestOrthonormality at CCTK_INITIAL
+#  {
+#    LANG: C
+#  } "Loop over modes and integrate them to check orthonormality"
+#
+#  schedule MultipoleX_TestIntegrationConvergence at CCTK_PARAMCHECK
+#  {
+#    LANG: C
+#    Reads: MultipoleX::test_integration_results
+#    Writes: MultipoleX::test_integration_convergence_orders
+#  } "Test convergence of integration"
+#
+#  schedule MultipoleX_TestIntegrationSymmetry at CCTK_PARAMCHECK
+#  {
+#    LANG: C
+#    Writes: MultipoleX::test_integration_symmetries
+#  } "Test symmetry of integration"
+}

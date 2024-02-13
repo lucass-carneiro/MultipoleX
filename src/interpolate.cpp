@@ -1,9 +1,9 @@
 #include "interpolate.hpp"
 
-#include <cctk.h>
-#include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
 #include <util_Table.h>
+
+#include <cmath>
 
 static void report_interp_error(int ierr) {
   if (ierr < 0) {
@@ -12,23 +12,22 @@ static void report_interp_error(int ierr) {
   }
 }
 
-/* TODO: This function uses the cactus interpolation infrastructure, so it
- * should work out of the box, but maybe it won't
- */
-void MultipoleX::Interp(CCTK_ARGUMENTS, const real_vec &xs, const real_vec &ys,
-                        const real_vec &zs, int real_idx, int imag_idx,
-                        real_vec &sphere_real, real_vec &sphere_imag) {
+void MultipoleX::Multipole_Interp(CCTK_ARGUMENTS,
+                                  std::vector<CCTK_REAL> const &xs,
+                                  std::vector<CCTK_REAL> const &ys,
+                                  std::vector<CCTK_REAL> const &zs,
+                                  int real_idx, int imag_idx,
+                                  std::vector<CCTK_REAL> &sphere_real,
+                                  std::vector<CCTK_REAL> &sphere_imag) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  /*
-   * Need parameters for the following:
-   * ntheta (dtheta = pi/(ntheta)
-   * nphi (dphi = 2pi/(nphi)
-   * r (radius of sphere)
-   * NOTE: depending on the interval of integration, denominator above may
-   * need to be modified to avoid double counting
-   */
+  // Need parameters for the following:
+  // ntheta (dtheta = pi/(ntheta)
+  // nphi (dphi = 2pi/(nphi)
+  // r (radius of sphere)
+  // NOTE: depending on the interval of integration, denominator above may
+  // need to be modified to avoid double counting
 
   CCTK_INT num_input_arrays = imag_idx == -1 ? 1 : 2;
   CCTK_INT num_output_arrays = imag_idx == -1 ? 1 : 2;

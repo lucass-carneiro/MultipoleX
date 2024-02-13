@@ -1,12 +1,19 @@
+// TODO: Maybe use SSHT instead of computing our own harmonics
+
 #include "sphericalharmonic.hpp"
 
-#include <cctk_Arguments.h>
+#include <cctk.h>
 #include <cctk_Parameters.h>
+#include <cctk_Arguments.h>
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
-static inline double factorial(int n) {
+// TODO: Use M_Pi?
+static const CCTK_REAL PI = acos(-1.0);
+
+static double factorial(int n) {
   double returnval = 1;
   for (int i = n; i >= 1; i--) {
     returnval *= i;
@@ -27,66 +34,61 @@ static inline int imin(int a, int b) { return a < b ? a : b; }
 
 static inline int imax(int a, int b) { return a > b ? a : b; }
 
-void MultipoleX::HarmonicSetup(int s, int l, int m, const real_vec &th,
-                               const real_vec &ph, real_vec &reY,
-                               real_vec &imY) {
-  for (size_t i = 0; i < th.size(); i++) {
-    SphericalHarmonic(s, l, m, th[i], ph[i], &reY[i], &imY[i]);
-  }
-}
-
 void MultipoleX::SphericalHarmonic(int s, int l, int m, CCTK_REAL th,
                                    CCTK_REAL ph, CCTK_REAL *reY,
                                    CCTK_REAL *imY) {
-  using std::cos;
-  using std::pow;
-  using std::sin;
-  using std::sqrt;
-
+  //  assert(s == -2 && l == 2 && m == 2);
+  //  *reY = 1.0/2.0 * sqrt(5/PI) * pow(cos(th/2), 4) * cos(2*ph);
+  //  *imY = 1.0/2.0 * sqrt(5/PI) * pow(cos(th/2), 4) * sin(2*ph);
   double all_coeff = 0, sum = 0;
   all_coeff = pow(-1.0, m);
   all_coeff *= sqrt(factorial(l + m) * factorial(l - m) * (2 * l + 1) /
-                    (4. * M_PI * factorial(l + s) * factorial(l - s)));
-
+                    (4. * PI * factorial(l + s) * factorial(l - s)));
   sum = 0.;
   for (int i = imax(m - s, 0); i <= imin(l + m, l - s); i++) {
     double sum_coeff = combination(l - s, i) * combination(l + s, i + s - m);
     sum += sum_coeff * pow(-1.0, l - i - s) * pow(cos(th / 2.), 2 * i + s - m) *
            pow(sin(th / 2.), 2 * (l - i) + m - s);
   }
-
   *reY = all_coeff * sum * cos(m * ph);
   *imY = all_coeff * sum * sin(m * ph);
 }
 
-// TODO: Change loop to CarpetX
-// TODO: Enable this function for testing in the schedule.
+void MultipoleX::HarmonicSetup(int s, int l, int m,
+                               std::vector<CCTK_REAL> const &th,
+                               std::vector<CCTK_REAL> const &ph,
+                               std::vector<CCTK_REAL> &reY,
+                               std::vector<CCTK_REAL> &imY) {
+  for (size_t i = 0; i < th.size(); i++) {
+    MultipoleX::SphericalHarmonic(s, l, m, th[i], ph[i], &reY[i], &imY[i]);
+  }
+}
+
 // Fill a grid function with a given spherical harmonic
-// extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
-//   DECLARE_CCTK_ARGUMENTS_MultipoleX_SetHarmonic;
-//   DECLARE_CCTK_PARAMETERS;
+extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
+  DECLARE_CCTK_ARGUMENTS_MultipoleX_SetHarmonic;
+  DECLARE_CCTK_PARAMETERS;
 
-//   for (int k = 0; k < cctk_lsh[2]; k++) {
-//     for (int j = 0; j < cctk_lsh[1]; j++) {
-//       for (int i = 0; i < cctk_lsh[0]; i++) {
-//         int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
+  for (int k = 0; k < cctk_lsh[2]; k++) {
+    for (int j = 0; j < cctk_lsh[1]; j++) {
+      for (int i = 0; i < cctk_lsh[0]; i++) {
+        int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
 
-//         CCTK_REAL theta = acos(z[index] / r[index]);
-//         CCTK_REAL phi = atan2(y[index], x[index]);
+        CCTK_REAL theta = acos(z[index] / r[index]);
+        CCTK_REAL phi = atan2(y[index], x[index]);
 
-//         CCTK_REAL re = 0;
-//         CCTK_REAL im = 0;
+        CCTK_REAL re = 0;
+        CCTK_REAL im = 0;
 
-//         MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi,
-//         &re,
-//                                       &im);
+        MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi, &re,
+                                      &im);
 
-//         CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
+        CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
 
-//         harmonic_re[index] = re * fac;
-//         harmonic_im[index] = im * fac;
-//       }
-//     }
-//   }
-//   return;
-// }
+        harmonic_re[index] = re * fac;
+        harmonic_im[index] = im * fac;
+      }
+    }
+  }
+  return;
+}

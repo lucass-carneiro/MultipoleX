@@ -2,11 +2,11 @@
 
 # Source files in this directory
 SRCS =                  \
-  coordinates.cpp       \
   integrate.cpp         \
   interpolate.cpp       \
-  mode_array.cpp        \
-  multipole_calc.cpp    \
-  output.cpp            \
-  paramcheck.cpp        \
+  multipole.cpp         \
   sphericalharmonic.cpp \
+  utils.cpp
+
+# Subdirectories containing source files
+SUBDIRS =

@@ -1,5 +1,6 @@
-# Configuration definitions for thorn MultipoleX
 
-REQUIRES CarpetX Arith Loop
+REQUIRES Loop
 
-OPTIONAL HDF5 {}
+OPTIONAL HDF5
+{
+}
