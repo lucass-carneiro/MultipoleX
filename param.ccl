@@ -2,19 +2,20 @@
 
 RESTRICTED:
 
-#
-# Interpolator params
-#
-
+# TODO: This could be fixed  to CarpetX
 CCTK_STRING interpolator_name "Which interpolator should I use"
 {
     ".+" :: "Any nonempty string"
 } "Hermite polynomial interpolation"
 
+# TODO: This could be tied to the CarpetX setting
 CCTK_STRING interpolator_pars "Parameters for the interpolator"
 {
     ".*" :: "Any string that Util_TableSetFromString() will take"
-} "order=3 boundary_off_centering_tolerance={0.0 0.0 0.0 0.0 0.0 0.0} boundary_extrapolation_tolerance={0.0 0.0 0.0 0.0 0.0 0.0}"
+} "order=1"
+
+# TODO: These settings were in the original thorn, but seem to be unused in CarpetX
+#boundary_off_centering_tolerance={0.0 0.0 0.0 0.0 0.0 0.0} boundary_extrapolation_tolerance={0.0 0.0 0.0 0.0 0.0 0.0}
 
 # The above makes sure that the interpolator doesn't off-centre the
 # interpolation stencil if there are insufficient points to
@@ -22,6 +23,7 @@ CCTK_STRING interpolator_pars "Parameters for the interpolator"
 # for the interpolation method used, and can lead to processor-number
 # dependent results.
 
+# TODO: This string seems to be unused in CarpetX
 CCTK_STRING coord_system "What is the coord system?"
 {
     ".*" :: "Any smart string will do"
@@ -87,6 +89,7 @@ CCTK_STRING variables "What variables to decompose"
     ".*" :: "A list of variables"
 } ""
 
+# TODO: Not used  anywhere
 CCTK_BOOLEAN verbose "Output detailed information about what is happening"
 {
 } "no"
@@ -120,6 +123,7 @@ CCTK_BOOLEAN test_mode_proportional_to_r "whether the test spherical harmonic co
 {
 } "no"
 
+#TODO: These are deprecated but the code won't compile without them
 
 # This parameter is deprecated and is no longer used
 KEYWORD mode_type "Which type of mode extraction do we have" STEERABLE=always

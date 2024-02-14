@@ -51,5 +51,8 @@ MultipoleX::integration_method = "midpoint"
 
 MultipoleX::out_1d_every = 1
 
+MultipoleX::verbose = yes
+MultipoleX::coord_system = "The quick brown fox jumps over the lazy dog"
+
 IO::out_dir       = $parfile
 IO::out_fileinfo  = "none"
