@@ -12,13 +12,11 @@ static void report_interp_error(int ierr) {
   }
 }
 
-void MultipoleX::Multipole_Interp(CCTK_ARGUMENTS,
-                                  std::vector<CCTK_REAL> const &xs,
-                                  std::vector<CCTK_REAL> const &ys,
-                                  std::vector<CCTK_REAL> const &zs,
-                                  int real_idx, int imag_idx,
-                                  std::vector<CCTK_REAL> &sphere_real,
-                                  std::vector<CCTK_REAL> &sphere_imag) {
+void MultipoleX::Interp(CCTK_ARGUMENTS, std::vector<CCTK_REAL> const &xs,
+                        std::vector<CCTK_REAL> const &ys,
+                        std::vector<CCTK_REAL> const &zs, int real_idx,
+                        int imag_idx, std::vector<CCTK_REAL> &sphere_real,
+                        std::vector<CCTK_REAL> &sphere_imag) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 

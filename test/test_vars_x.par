@@ -1,0 +1,55 @@
+ActiveThorns = "
+    CarpetX
+    IOUtil
+    CoordinatesX
+    MultipoleX
+"
+
+Cactus::cctk_show_schedule = no
+Cactus::presync_mode       = "mixed-error"
+
+Cactus::terminate   = "iteration"
+Cactus::cctk_itlast = 0
+
+CarpetX::blocking_factor_x = 1
+CarpetX::blocking_factor_y = 1
+CarpetX::blocking_factor_z = 1
+
+CarpetX::poison_undefined_values = yes
+
+CarpetX::xmin = -10
+CarpetX::xmax = +10
+
+CarpetX::ymin = -10
+CarpetX::ymax = +10
+
+CarpetX::zmin = -10
+CarpetX::zmax = +10
+
+
+CarpetX::ncells_x = 100
+CarpetX::ncells_y = 100
+CarpetX::ncells_z = 100
+
+
+MultipoleX::interpolator_name = "CarpetX"
+
+CarpetX::interpolation_order  = 3
+MultipoleX::interpolator_pars = "order=3"
+
+MultipoleX::nradii = 1
+MultipoleX::radius[0] = 8.0
+MultipoleX::l_max = 2
+
+MultipoleX::variables = "
+  CoordinatesX::vcoordx
+  CoordinatesX::vcoordy
+  CoordinatesX::vcoordz
+"
+
+MultipoleX::integration_method = "midpoint"
+
+MultipoleX::out_1d_every = 1
+
+IO::out_dir       = $parfile
+IO::out_fileinfo  = "none"

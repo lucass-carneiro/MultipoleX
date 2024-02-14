@@ -16,8 +16,8 @@
 
 1. See the `TODOs` marked over the source files
 2. Fill author names.
-3. Add doc
-4. Add test cases.
+3. Make sure that all test cases are passing
+4. Add doc
 
 # Purpose of This Thorn
 

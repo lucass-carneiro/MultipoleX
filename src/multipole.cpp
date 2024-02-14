@@ -284,16 +284,16 @@ extern "C" void MultipoleX_Calc(CCTK_ARGUMENTS) {
   int lmax = get_l_max();
 
   if (!initialized) {
-    real.reserve(array_size);
-    imag.reserve(array_size);
-    th.reserve(array_size);
-    ph.reserve(array_size);
-    xs.reserve(array_size);
-    ys.reserve(array_size);
-    zs.reserve(array_size);
-    xhat.reserve(array_size);
-    yhat.reserve(array_size);
-    zhat.reserve(array_size);
+    real.resize(array_size);
+    imag.resize(array_size);
+    th.resize(array_size);
+    ph.resize(array_size);
+    xs.resize(array_size);
+    ys.resize(array_size);
+    zs.resize(array_size);
+    xhat.resize(array_size);
+    yhat.resize(array_size);
+    zhat.resize(array_size);
 
     parse_variables_string(std::string(variables), vars);
     get_spin_weights(vars, spin_weights);
@@ -314,8 +314,8 @@ extern "C" void MultipoleX_Calc(CCTK_ARGUMENTS) {
       MultipoleX::ScaleCartesian(radius[i], xhat, yhat, zhat, xs, ys, zs);
 
       // Interpolate Psi4r and Psi4i
-      MultipoleX::Multipole_Interp(CCTK_PASS_CTOC, xs, ys, zs, vars[v].index,
-                                   vars[v].imag_index, real, imag);
+      MultipoleX::Interp(CCTK_PASS_CTOC, xs, ys, zs, vars[v].index,
+                         vars[v].imag_index, real, imag);
       for (int l = 0; l <= lmax; l++) {
         for (int m = -l; m <= l; m++) {
           // Integrate sYlm (real + i imag) over the sphere at radius r

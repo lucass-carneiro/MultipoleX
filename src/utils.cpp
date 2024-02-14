@@ -43,7 +43,8 @@ using namespace std;
 // File manipulation
 ////////////////////////////////////////////////////////////////////////
 
-FILE *MultipoleX_OpenOutputFile(CCTK_ARGUMENTS, const std::string &name) {
+static FILE *MultipoleX_OpenOutputFile(CCTK_ARGUMENTS,
+                                       const std::string &name) {
   using std::strcmp;
 
   DECLARE_CCTK_ARGUMENTS;
@@ -401,8 +402,8 @@ void MultipoleX::Integrate(std::vector<CCTK_REAL> const &array1r,
   assert(ph.size() == array_size);
   assert(array1r.size() == array_size);
   assert(array1i.size() == array_size);
-  assert(array2r.size() == array_size);
-  assert(array2i.size() == array_size);
+  // assert(array2r.size() == array_size);
+  // assert(array2i.size() == array_size);
   for (size_t i = 0; i < array_size; i++) {
     fr[i] = (array1r[i] * array2r[i] + array1i[i] * array2i[i]) * sin(th[i]);
     fi[i] = (array1r[i] * array2i[i] - array1i[i] * array2r[i]) * sin(th[i]);

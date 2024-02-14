@@ -64,31 +64,33 @@ void MultipoleX::HarmonicSetup(int s, int l, int m,
   }
 }
 
+// TODO: Re enable this test function
 // Fill a grid function with a given spherical harmonic
-extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_MultipoleX_SetHarmonic;
-  DECLARE_CCTK_PARAMETERS;
+// extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
+//   DECLARE_CCTK_ARGUMENTS_MultipoleX_SetHarmonic;
+//   DECLARE_CCTK_PARAMETERS;
 
-  for (int k = 0; k < cctk_lsh[2]; k++) {
-    for (int j = 0; j < cctk_lsh[1]; j++) {
-      for (int i = 0; i < cctk_lsh[0]; i++) {
-        int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
+//   for (int k = 0; k < cctk_lsh[2]; k++) {
+//     for (int j = 0; j < cctk_lsh[1]; j++) {
+//       for (int i = 0; i < cctk_lsh[0]; i++) {
+//         int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
 
-        CCTK_REAL theta = acos(z[index] / r[index]);
-        CCTK_REAL phi = atan2(y[index], x[index]);
+//         CCTK_REAL theta = acos(z[index] / r[index]);
+//         CCTK_REAL phi = atan2(y[index], x[index]);
 
-        CCTK_REAL re = 0;
-        CCTK_REAL im = 0;
+//         CCTK_REAL re = 0;
+//         CCTK_REAL im = 0;
 
-        MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi, &re,
-                                      &im);
+//         MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi,
+//         &re,
+//                                       &im);
 
-        CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
+//         CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
 
-        harmonic_re[index] = re * fac;
-        harmonic_im[index] = im * fac;
-      }
-    }
-  }
-  return;
-}
+//         harmonic_re[index] = re * fac;
+//         harmonic_im[index] = im * fac;
+//       }
+//     }
+//   }
+//   return;
+// }

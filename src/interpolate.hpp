@@ -8,14 +8,13 @@
 
 namespace MultipoleX {
 
-// Multipole_Interp:
+// Interp:
 //      This function interpolates psi4 onto the sphere in cartesian
 //      coordinates as created by MultipoleX::CoordSetup.
-void Multipole_Interp(CCTK_ARGUMENTS, std::vector<CCTK_REAL> const &x,
-                      std::vector<CCTK_REAL> const &y,
-                      std::vector<CCTK_REAL> const &z, int real_idx,
-                      int imag_idx, std::vector<CCTK_REAL> &psi4r,
-                      std::vector<CCTK_REAL> &psi4i);
+void Interp(CCTK_ARGUMENTS, std::vector<CCTK_REAL> const &x,
+            std::vector<CCTK_REAL> const &y, std::vector<CCTK_REAL> const &z,
+            int real_idx, int imag_idx, std::vector<CCTK_REAL> &psi4r,
+            std::vector<CCTK_REAL> &psi4i);
 
 } // namespace MultipoleX
 
