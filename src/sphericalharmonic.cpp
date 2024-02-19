@@ -2,6 +2,8 @@
 
 #include "sphericalharmonic.hpp"
 
+#include <loop.hxx>
+
 #include <cctk.h>
 #include <cctk_Parameters.h>
 #include <cctk_Arguments.h>
@@ -64,33 +66,34 @@ void MultipoleX::HarmonicSetup(int s, int l, int m,
   }
 }
 
-// TODO: Re enable this test function
 // Fill a grid function with a given spherical harmonic
-// extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
-//   DECLARE_CCTK_ARGUMENTS_MultipoleX_SetHarmonic;
-//   DECLARE_CCTK_PARAMETERS;
+extern "C" void MultipoleX_SetHarmonic(CCTK_ARGUMENTS) {
+  DECLARE_CCTK_ARGUMENTSX_MultipoleX_SetHarmonic;
+  DECLARE_CCTK_PARAMETERS;
 
-//   for (int k = 0; k < cctk_lsh[2]; k++) {
-//     for (int j = 0; j < cctk_lsh[1]; j++) {
-//       for (int i = 0; i < cctk_lsh[0]; i++) {
-//         int index = CCTK_GFINDEX3D(cctkGH, i, j, k);
+  using std::acos;
+  using std::atan2;
+  using std::sqrt;
 
-//         CCTK_REAL theta = acos(z[index] / r[index]);
-//         CCTK_REAL phi = atan2(y[index], x[index]);
+  grid.loop_all<0, 0, 0>(
+      grid.nghostzones,
+      [=](const Loop::PointDesc &p) CCTK_ATTRIBUTE_ALWAYS_INLINE {
+        const auto x = vcoordx(p.I);
+        const auto y = vcoordy(p.I);
+        const auto z = vcoordz(p.I);
+        const auto r = sqrt(x * x + y * y + z * z);
+        const auto theta = acos(z / r);
+        const auto phi = atan2(y, x);
 
-//         CCTK_REAL re = 0;
-//         CCTK_REAL im = 0;
+        CCTK_REAL re = 0;
+        CCTK_REAL im = 0;
 
-//         MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi,
-//         &re,
-//                                       &im);
+        MultipoleX::SphericalHarmonic(test_sw, test_l, test_m, theta, phi, &re,
+                                      &im);
 
-//         CCTK_REAL fac = test_mode_proportional_to_r ? r[index] : 1.0;
+        const auto fac = test_mode_proportional_to_r ? r : 1.0;
 
-//         harmonic_re[index] = re * fac;
-//         harmonic_im[index] = im * fac;
-//       }
-//     }
-//   }
-//   return;
-// }
+        harmonic_re(p.I) = re * fac;
+        harmonic_im(p.I) = im * fac;
+      });
+}

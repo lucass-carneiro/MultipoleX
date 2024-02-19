@@ -1,15 +1,23 @@
 ActiveThorns = "
     CarpetX
-    IOUtil
     CoordinatesX
     MultipoleX
+    IOUtil
 "
+
+##########
+# Cactus #
+##########
 
 Cactus::cctk_show_schedule = no
 Cactus::presync_mode       = "mixed-error"
 
 Cactus::terminate   = "iteration"
 Cactus::cctk_itlast = 0
+
+###########
+# CarpetX #
+###########
 
 CarpetX::blocking_factor_x = 1
 CarpetX::blocking_factor_y = 1
@@ -31,6 +39,13 @@ CarpetX::ncells_x = 100
 CarpetX::ncells_y = 100
 CarpetX::ncells_z = 100
 
+##############
+# MultipoleX #
+##############
+
+MultipoleX::verbose     = yes
+
+MultipoleX::coord_system = "The quick brown fox jumps over the lazy dog"
 
 MultipoleX::interpolator_name = "CarpetX"
 
@@ -51,8 +66,14 @@ MultipoleX::integration_method = "midpoint"
 
 MultipoleX::out_1d_every = 1
 
-MultipoleX::verbose = yes
-MultipoleX::coord_system = "The quick brown fox jumps over the lazy dog"
+##########
+# Output #
+##########
 
 IO::out_dir       = $parfile
 IO::out_fileinfo  = "none"
+
+CarpetX::out_tsv = yes
+CarpetX::out_tsv_vars = "
+  MultipoleX::harmonics
+"

@@ -74,10 +74,13 @@ static CCTK_REAL test_pi_symmetric_sphere_integral(
   return result;
 }
 
-static CCTK_REAL integration_convergence_order(
-    CCTK_REAL (*integration_fn)(const CCTK_REAL *, int, int, CCTK_REAL,
-                                CCTK_REAL),
-    CCTK_REAL *store_low, CCTK_REAL *store_high, const int is_midpoint) {
+using integration_fn_t = CCTK_REAL (*)(const CCTK_REAL *, int, int, CCTK_REAL,
+                                       CCTK_REAL);
+
+static CCTK_REAL integration_convergence_order(integration_fn_t integration_fn,
+                                               CCTK_REAL *store_low,
+                                               CCTK_REAL *store_high,
+                                               const int is_midpoint) {
   const int n1 = 100;
   const int n2 = 200;
   const CCTK_REAL PI = acos(-1.0);
@@ -92,7 +95,7 @@ static CCTK_REAL integration_convergence_order(
 }
 
 extern "C" void MultipoleX_TestIntegrationConvergence(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_MultipoleX_TestIntegrationConvergence;
+  DECLARE_CCTK_ARGUMENTSX_MultipoleX_TestIntegrationConvergence;
 
   *test_simpson_convergence_order = integration_convergence_order(
       &MultipoleX::Trapezoidal2DIntegral, test_simpson_result_low,
@@ -106,7 +109,7 @@ extern "C" void MultipoleX_TestIntegrationConvergence(CCTK_ARGUMENTS) {
 }
 
 extern "C" void MultipoleX_TestIntegrationSymmetry(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_MultipoleX_TestIntegrationSymmetry;
+  DECLARE_CCTK_ARGUMENTSX_MultipoleX_TestIntegrationSymmetry;
 
   *test_simpson_pi_symmetry =
       test_pi_symmetric_sphere_integral(&MultipoleX::Trapezoidal2DIntegral, 0);
@@ -125,7 +128,7 @@ extern "C" void MultipoleX_TestIntegrationSymmetry(CCTK_ARGUMENTS) {
 }
 
 void MultipoleX_TestOrthonormality(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_MultipoleX_TestOrthonormality;
+  DECLARE_CCTK_ARGUMENTSX_MultipoleX_TestOrthonormality;
   DECLARE_CCTK_PARAMETERS;
 
   /* Campute Cartesian coordinates of points on the sphere */

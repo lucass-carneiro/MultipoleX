@@ -23,7 +23,7 @@ CCTK_STRING interpolator_pars "Parameters for the interpolator"
 # for the interpolation method used, and can lead to processor-number
 # dependent results.
 
-# TODO: This string seems to be unused in CarpetX
+# TODO: This string seems to be unused in CarpetX. Maybe it can be removed?
 CCTK_STRING coord_system "What is the coord system?"
 {
     ".*" :: "Any smart string will do"
@@ -89,7 +89,7 @@ CCTK_STRING variables "What variables to decompose"
     ".*" :: "A list of variables"
 } ""
 
-# TODO: Not used  anywhere
+# TODO: Increase usage of verbosity
 CCTK_BOOLEAN verbose "Output detailed information about what is happening"
 {
 } "no"

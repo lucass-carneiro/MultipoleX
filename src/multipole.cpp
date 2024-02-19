@@ -234,7 +234,7 @@ static void setup_harmonics(
 }
 
 extern "C" void MultipoleX_ParamCheck(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_MultipoleX_ParamCheck;
+  DECLARE_CCTK_ARGUMENTSX_MultipoleX_ParamCheck;
   DECLARE_CCTK_PARAMETERS;
 
   if (l_mode != -1) {
@@ -262,8 +262,12 @@ extern "C" void MultipoleX_ParamCheck(CCTK_ARGUMENTS) {
 }
 
 extern "C" void MultipoleX_Calc(CCTK_ARGUMENTS) {
-  DECLARE_CCTK_ARGUMENTS_MultipoleX_Calc;
+  DECLARE_CCTK_ARGUMENTSX_MultipoleX_Calc;
   DECLARE_CCTK_PARAMETERS;
+
+  if (verbose) {
+    CCTK_VINFO("Computing multipoles");
+  }
 
   static std::vector<CCTK_REAL> xs, ys, zs;
   static std::vector<CCTK_REAL> xhat, yhat, zhat;
