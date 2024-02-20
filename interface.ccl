@@ -13,7 +13,7 @@ REQUIRES FUNCTION IO_TruncateOutputFiles
 
 PUBLIC:
 
-CCTK_REAL harmonics TYPE=gf TAGS='checkpoint="no"'
+CCTK_REAL harmonics TYPE=gf CENTERING={vvv} TAGS='checkpoint="no"'
 {
   harmonic_re, harmonic_im
 } "Spherical harmonics"

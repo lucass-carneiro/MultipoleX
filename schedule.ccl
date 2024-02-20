@@ -30,7 +30,7 @@ if (enable_test)
   SCHEDULE MultipoleX_SetHarmonic AT initial
   {
     READS: CoordinatesX::vertex_coords(everywhere)
-    Writes: MultipoleX::harmonics(interior)
+    Writes: MultipoleX::harmonics(everywhere)
     LANG: C
   } "Populate grid functions with spherical harmonics"
 
